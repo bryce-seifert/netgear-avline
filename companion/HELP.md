@@ -1,3 +1,3 @@
-## Your module
+## Netgear AVLine
 
-Write some help for your users here!
+Control Netgear AVLive AV-over-IP network switches.

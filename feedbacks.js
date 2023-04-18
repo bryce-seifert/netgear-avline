@@ -1,33 +1,62 @@
-const { combineRgb } = require('@companion-module/base')
+import { combineRgb } from '@companion-module/base'
 
-module.exports = async function (self) {
-	self.setFeedbackDefinitions({
-		ChannelState: {
-			name: 'Example Feedback',
-			type: 'boolean',
-			label: 'Channel State',
-			defaultStyle: {
-				bgcolor: combineRgb(255, 0, 0),
-				color: combineRgb(0, 0, 0),
-			},
-			options: [
-				{
-					id: 'num',
-					type: 'number',
-					label: 'Test',
-					default: 5,
-					min: 0,
-					max: 10,
-				},
-			],
-			callback: (feedback) => {
-				console.log('Hello world!', feedback.options.num)
-				if (feedback.options.num > 5) {
-					return true
-				} else {
-					return false
-				}
-			},
+export function getFeedbacks() {
+	const feedbacks = {}
+
+	const ColorWhite = combineRgb(255, 255, 255)
+	const ColorBlack = combineRgb(0, 0, 0)
+	const ColorRed = combineRgb(200, 0, 0)
+	const ColorGreen = combineRgb(0, 200, 0)
+	const ColorOrange = combineRgb(255, 102, 0)
+
+	feedbacks['poeEnabled'] = {
+		type: 'boolean',
+		name: 'POE Enabled',
+		description: 'Change style if port has POE enabled',
+		defaultStyle: {
+			bgcolor: ColorGreen,
 		},
-	})
+		options: [
+			{
+				type: 'number',
+				label: 'Port',
+				id: 'port',
+				default: 1,
+				min: 1,
+			},
+		],
+		callback: (feedback) => {
+			let portInfo = this.switch?.poePortConfig?.find(({ portid }) => portid === feedback.options.port)
+
+			if (portInfo) {
+				return portInfo.enable
+			}
+		},
+	}
+	feedbacks['linkStatus'] = {
+		type: 'boolean',
+		name: 'Link Status',
+		description: 'Change style if port has active link',
+		defaultStyle: {
+			bgcolor: ColorGreen,
+		},
+		options: [
+			{
+				type: 'number',
+				label: 'Port',
+				id: 'port',
+				default: 1,
+				min: 1,
+			},
+		],
+		callback: (feedback) => {
+			let portInfo = this.switch?.switchStatsPort?.find(({ portId }) => portId === feedback.options.port)
+
+			if (portInfo) {
+				return portInfo.status === 0 ? true : false
+			}
+		},
+	}
+
+	return feedbacks
 }
